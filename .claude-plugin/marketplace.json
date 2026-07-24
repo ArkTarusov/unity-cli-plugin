@@ -1,0 +1,15 @@
+{
+  "name": "unity-cli-plugin",
+  "description": "Agent skills for UnityCLI — Unity's standalone terminal tool for editor management and live Editor automation.",
+  "owner": {
+    "name": "Ark Tarusov"
+  },
+  "plugins": [
+    {
+      "name": "unity-cli",
+      "source": "./",
+      "description": "Skills for the `unity` CLI: live Editor control via the Pipeline package, editor/module installs, CI-friendly output.",
+      "category": "development"
+    }
+  ]
+}

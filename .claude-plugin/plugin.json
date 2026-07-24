@@ -1,0 +1,8 @@
+{
+  "name": "unity-cli",
+  "description": "Teaches agents to drive Unity from the terminal with UnityCLI: control a running Editor (build, test, play mode, scene/asset commands), manage Editor installs and modules, and use CI-friendly structured output.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Ark Tarusov"
+  }
+}

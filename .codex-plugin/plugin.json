@@ -1,0 +1,11 @@
+{
+  "name": "unity-cli",
+  "version": "0.1.0",
+  "description": "Skills teaching agents to drive Unity from the terminal with UnityCLI: control a running Editor (build, test, play mode, scene/asset commands), manage Editor installs and modules, CI-friendly structured output.",
+  "author": {
+    "name": "Ark Tarusov"
+  },
+  "license": "MIT",
+  "keywords": ["unity", "unity-cli", "unity-editor", "automation", "gamedev"],
+  "skills": "./skills/"
+}
