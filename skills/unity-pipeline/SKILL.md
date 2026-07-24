@@ -5,7 +5,7 @@ description: Use when automating a running Unity Editor from the terminal via Un
 
 # Driving the Unity Editor via UnityCLI
 
-The Unity Pipeline package (`com.unity.pipeline`) runs a local HTTP server inside the Editor; `unity command` executes commands against it live — no relaunch, no batch mode. Prerequisite basics (PATH, `--json`, auth): see skill **unity-cli-core**.
+The Unity Pipeline package (`com.unity.pipeline`) runs a local HTTP server inside the Editor; `unity command` executes commands against it live — no relaunch, no batch mode. The exposed surface is full authoring (scenes, GameObjects, prefabs, materials, animation, script creation, packages, tests, builds) — the same command set MCP-based Unity integrations wrap, reachable without an MCP bridge. Prerequisite basics (PATH, `--json`, auth): see skill **unity-cli-core**.
 
 ## Prerequisites — check, don't install
 

@@ -84,3 +84,4 @@ unity auth login     # opens browser; --client-id/--client-secret for service ac
 | Parsing human-formatted table output | Pass `--json` and parse the structured result. |
 | Command hangs in CI/agent context | An interactive selector opened. Pass all required args plus `--non-interactive` (and `-y` where supported). |
 | Installing the CLI or the Pipeline package silently to unblock a task | Both are user-consent installs — propose the command, wait for a yes. |
+| Treating an `EBUSY: resource busy or locked, rm` failure as caused by your invocation | Observed beta flakiness in commands that read Hub-shared data (`releases`, `templates`, `projects`, `doctor`, `open`); Editor-connection commands (`status`, `command`, `list`, `pipeline list`) keep working. Report it, work through the Editor-connection commands, don't retry-loop. |

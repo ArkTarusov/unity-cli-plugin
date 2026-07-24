@@ -4,6 +4,15 @@
 
 UnityCLI shipped after most LLM knowledge cutoffs, so out of the box an agent doesn't know the tool exists: it falls back to legacy `Unity.exe -batchmode` flags, searches Unity Hub folders for a CLI that isn't there, or concludes the tool "isn't installed" because of a stale shell PATH. These agent skills close that gap — locating the binary, agent/CI-friendly invocation, live Editor command patterns, and a strict rule that installs are proposed to the user, never run silently.
 
+## Why CLI instead of an MCP server
+
+The Unity Pipeline package exposes the running Editor's full authoring surface — 140+ commands for scenes, GameObjects, prefabs, materials, animation, script creation, package management, tests, and builds. That is the same command set MCP-based Unity integrations wrap; `unity command` reaches it directly, so an agent can *develop the game* from the terminal:
+
+- no MCP server process or per-client configuration — any agent with a shell can work;
+- structured JSON results and exit codes out of the box (`--json`);
+- the command list is served live by the Editor (`unity command`), including project-registered custom `[CliCommand]` tools;
+- the same binary still offers an MCP bridge (`unity mcp`) when a host prefers MCP tools.
+
 ## What's inside
 
 One plugin, three skills — the agent loads only what the task needs:
