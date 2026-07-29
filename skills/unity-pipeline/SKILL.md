@@ -1,6 +1,6 @@
 ---
 name: unity-pipeline
-description: Use when automating a running Unity Editor from the terminal via UnityCLI — entering play mode, running builds or tests, executing editor commands for scenes, GameObjects, prefabs, assets, materials, packages, or settings, polling build/recompile/bake status — or when `unity command` or `unity status` reports no connected Editor or a missing Pipeline package, or the Editor hangs or shows a modal dialog.
+description: Use when automating a running Unity Editor from the terminal via UnityCLI — entering play mode, running builds or tests, executing editor commands for scenes, GameObjects, prefabs, assets, materials, or settings, adding or removing UPM packages in the running Editor, polling build/recompile/bake status — or when `unity command` or `unity status` reports no connected Editor or a missing Pipeline package, or the Editor hangs or shows a modal dialog.
 ---
 
 # Driving the Unity Editor via UnityCLI

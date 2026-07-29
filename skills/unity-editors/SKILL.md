@@ -1,6 +1,6 @@
 ---
 name: unity-editors
-description: Use when installing or uninstalling Unity Editor versions or modules from the terminal, listing installed editors or available Unity releases, activating Unity licenses, opening or creating Unity projects from the command line, or replacing Unity Hub on CI machines and headless workers.
+description: Use when installing or uninstalling Unity Editor versions or modules from the terminal, listing installed editors or available Unity releases, activating Unity licenses, opening projects or creating project skeletons from the command line (`unity projects new/create` mechanics — not a guided design-a-new-game flow), or replacing Unity Hub on CI machines and headless workers.
 ---
 
 # Unity editors, modules, projects (Hub replacement)

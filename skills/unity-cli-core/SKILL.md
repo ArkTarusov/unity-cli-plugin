@@ -1,6 +1,6 @@
 ---
 name: unity-cli-core
-description: Use when a task involves UnityCLI — Unity's standalone `unity` terminal command — or any terminal-driven Unity automation. Also use when `unity` returns "command not found", when unsure whether the tool exists, when scripting Unity with JSON/TSV output, or when checking Unity Editor connection status, sign-in state, or CLI diagnostics.
+description: Use when a task involves UnityCLI — Unity's standalone `unity` terminal command — or any automation built on the `unity` binary. Also use when `unity` returns "command not found", when unsure whether the tool exists, when scripting Unity with JSON/TSV output, or when checking Unity Editor connection status, sign-in state, or CLI diagnostics. Not for in-project SDK work with no CLI surface — Unity Services (UGS) backends, in-app purchases, or ads mediation.
 ---
 
 # UnityCLI core
