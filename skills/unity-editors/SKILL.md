@@ -50,6 +50,6 @@ Omitting arguments starts interactive pickers. Always pass:
 | Windows install into protected path | Triggers a UAC elevation helper; `--no-elevate` makes it fail instead of prompting (better in CI) |
 | Editor version missing for a project | `unity projects require <path>` or the `--allow-install` flag on `build`/`test`/`run`/`open` installs it on demand |
 | Version from `ProjectVersion.txt` wrong for the task | `--editor-version <ver>` overrides; `-e/--editor-path` pins an exact binary |
-| Module IDs unknown | `unity modules list <version>` or `unity install-modules -e <version> -l` |
+| Module IDs unknown | `unity modules list <version>`, `unity install-modules -e <version> -l`, or `unity install <version> --list-components` |
 | Interrupted download | `unity install --resume`; cache location via `unity cache info` |
 | `unity open` / `unity editors` fail with `EBUSY` | Lock contention on the shared `%APPDATA%\UnityHub` store — see the EBUSY row in skill **unity-cli-core** for the recovery procedure. Interim workaround: launch the editor binary directly (`& "<install-path>\Editor\Unity.exe" -projectPath <project>`) |
