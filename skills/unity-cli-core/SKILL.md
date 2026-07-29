@@ -50,6 +50,8 @@ unity --json --non-interactive <command>
 | `--non-interactive` (`UNITY_NON_INTERACTIVE`) | Disables prompts; many commands open interactive selectors when args are omitted |
 | `--no-banner`, `--quiet` (`UNITY_NO_BANNER`, `UNITY_QUIET`) | Suppress banner / info noise |
 | `--verbose` (`UNITY_VERBOSE`) | Full error details with stack traces |
+| `UNITY_NO_CONSENT_PROMPT` (env only, no flag) | Suppresses the one-time first-run analytics consent prompt without recording a choice — for wrappers and agent shells that must never absorb a prompt (`unity analytics` manages the persistent choice) |
+| `UNITY_NO_CRASH_REPORT` (env only, no flag) | Disables anonymous crash/error reporting entirely |
 
 Exit code is `0` on success, non-zero on failure (e.g. `6` for an unknown editor command). Error messages usually include recovery hints — read them.
 
