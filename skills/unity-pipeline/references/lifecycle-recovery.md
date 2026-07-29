@@ -68,7 +68,9 @@ Kill the process only when the main thread is already stuck (modal, deadlock). A
 
 The binary path of a running editor: `(Get-Process -Id <pid>).Path`. When no editor runs, `unity editors -i` lists install paths — unless it is itself EBUSY-broken, in which case the default install root above usually applies.
 
-Startup takes minutes on large projects: poll `unity status` until `state: ready`. If it never becomes ready, check for a `#32770` window — a startup dialog blocks the server from starting at all.
+Add `-batchmode` (and no `-quit`) to run headless: the editor stays resident and serves Pipeline commands, but **never registers in `unity status` or `unity editors running`** — its lockfile heartbeat differs from a GUI editor's. Probe it with `unity command --project-path <project>`; the `unity status`-based signals in the diagnosis table above only apply to GUI editors. A resident editor of either kind holds a license seat until it exits.
+
+Startup takes minutes on large projects: poll `unity status` until `state: ready` (GUI), or poll `unity command --project-path <project>` (batch). If it never becomes ready, check for a `#32770` window — a startup dialog blocks the server from starting at all.
 
 ## `EBUSY: resource busy or locked, rm`
 

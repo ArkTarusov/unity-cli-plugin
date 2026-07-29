@@ -26,7 +26,7 @@ Two mandatory habits:
 
 Live control needs BOTH: UnityCLI on the machine AND the Unity Pipeline package (`com.unity.pipeline`) inside the target project. The CLI alone can install/open editors but cannot talk to a running Editor.
 
-1. `unity status` — is an Editor running?
+1. `unity status` — is an Editor running? GUI editors only: an editor launched with `-batchmode` serves commands but never appears here — probe it with `unity command --project-path <path>` instead.
 2. `unity pipeline list` — does the project show **Pipeline: Installed**?
 
 If the package is missing, **stop and ask the user** — do not run the install to unblock yourself. `unity pipeline install` edits the project's `Packages/manifest.json` and triggers a recompile: a project change that lands in version control. Propose the exact command (`unity pipeline install --project-path <path>`; requires `unity auth login`) and continue only after approval. Same rule for `unity pipeline upgrade`. `unity pipeline list-versions` shows available versions.
@@ -84,13 +84,29 @@ These spawn an editor in batch mode instead of connecting to one:
 unity build . --target StandaloneWindows64 --execute-method Builder.PerformBuild -o ./out
 unity test . --mode EditMode --filter "MyNamespace" --output results.xml --timeout 1800
 unity run . -- -executeMethod Tool.Run -quit      # raw editor args after --
-unity run . --command my_command -- --arg value   # registered command, headless
+unity run . --command my_command -- --arg value   # registered command, one-shot: boots, runs, exits
 ```
 
 - `unity build` **requires** `--execute-method` — Unity has no built-in command-line build.
 - `--allow-install` downloads and installs the project's editor version if missing — multi-gigabyte; don't pass it without the user's OK.
 - `unity test` writes an NUnit XML report; set `--timeout` or a hung run never exits.
+- `unity run --command` mixes the editor log into stdout — parse with `--format ndjson`.
 - Against a **running** Editor, prefer `unity command build` / `unity command run_tests` (async, editor stays open).
+
+### Resident headless editor (agent / SSH build box)
+
+For many commands against one project, a fresh batch boot per command is wasteful. Launch the editor binary with `-batchmode` and **no `-quit`** — it loads the project, stays resident, and serves the Pipeline API like a GUI editor (~sub-second round-trips, no domain reload per call):
+
+```bash
+"<editor-binary>" -batchmode -projectPath <project> -logFile editor.log &
+# PowerShell: Start-Process "<editor-binary>" -ArgumentList '-batchmode','-projectPath','<project>','-logFile','editor.log'
+unity command --project-path <project>       # reachability probe + command list
+```
+
+- Such an editor is **invisible to `unity status` and `unity editors running`** (its lockfile heartbeat differs from a GUI editor's) — always target it via `--project-path` and probe with `unity command`/`unity list`, never `status`.
+- A bare `unity run <project>` (no `--command`) is NOT a way to get one: batch runs to completion and exits.
+- Any resident editor — batch or GUI — holds a license seat until it exits; one-shot `unity run --command` releases it on exit.
+- Binary paths per install: `unity editors -i` (the `location` field). Launching directly also sidesteps `unity open` EBUSY failures ([references/lifecycle-recovery.md](references/lifecycle-recovery.md)).
 
 ## Common mistakes
 
@@ -104,3 +120,4 @@ unity run . --command my_command -- --arg value   # registered command, headless
 | Using `unity build` while an Editor already runs on the project | Spawning a second editor instance fails or fights the open one; use `unity command build` against the running Editor |
 | Play-mode/domain-reload race after `package_add` or script edits | Poll `recompile_status` before the next command |
 | Treating `unity status: ready` as "Editor is responsive" | It only means the server process is alive; the main thread may be stuck — see [references/lifecycle-recovery.md](references/lifecycle-recovery.md) |
+| Concluding "no Editor" from an empty `unity status` | A `-batchmode` editor serves commands but never registers in `status` — probe `unity command --project-path <path>` before spawning a new editor |

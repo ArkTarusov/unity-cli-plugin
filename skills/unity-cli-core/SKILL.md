@@ -80,7 +80,7 @@ unity auth login     # opens browser; --client-id/--client-secret for service ac
 | Mistake | Reality |
 |---|---|
 | "`unity: command not found` → the tool doesn't exist / isn't installed" | Stale PATH. Check `%LOCALAPPDATA%\Unity\bin` (Windows) or a fresh login shell first. |
-| Reaching for `Unity.exe -batchmode` for automation | UnityCLI drives an already-running Editor without relaunching it; batch flags are the legacy path. |
+| Reaching for raw `Unity.exe -batchmode -quit` per action | UnityCLI drives an already-running Editor without relaunching it; for headless, `unity build`/`test`/`run` wrap batch mode, and `-batchmode` without `-quit` keeps a resident Pipeline-serving editor (skill **unity-pipeline**). |
 | Parsing human-formatted table output | Pass `--json` and parse the structured result. |
 | Command hangs in CI/agent context | An interactive selector opened. Pass all required args plus `--non-interactive` (and `-y` where supported). |
 | Installing the CLI or the Pipeline package silently to unblock a task | Both are user-consent installs — propose the command, wait for a yes. |
