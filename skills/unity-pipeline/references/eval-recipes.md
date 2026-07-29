@@ -80,4 +80,4 @@ public static class MyCommands
 }
 ```
 
-`CliCommandAttribute` also has `MainThreadRequired` and `RuntimeOnly` properties. For a recurring `eval` snippet, promoting it to a `[CliCommand]` gives typed arguments and discoverability.
+`CliCommandAttribute` also has `MainThreadRequired` and `RuntimeOnly` as named properties on the attribute (not separate attributes); `[CliCommand]`/`[CliArg]` live in assembly `Unity.Pipeline`. For a recurring `eval` snippet, promoting it to a `[CliCommand]` gives typed arguments and discoverability.
