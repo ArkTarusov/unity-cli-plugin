@@ -81,3 +81,5 @@ public static class MyCommands
 ```
 
 `CliCommandAttribute` also has `MainThreadRequired` and `RuntimeOnly` as named properties on the attribute (not separate attributes); `[CliCommand]`/`[CliArg]` live in assembly `Unity.Pipeline`. For a recurring `eval` snippet, promoting it to a `[CliCommand]` gives typed arguments and discoverability.
+
+After adding or changing a command in a running Editor: `unity command recompile`, poll `recompile_status` until `completed`, then `unity list` to confirm it registered. If the `.cs` was written outside pipeline commands, force an import first (see "Force asset import" above) — otherwise `recompile` answers `up_to_date`, nothing rebuilds, and the command never appears in `unity list`. The same command is also callable headlessly via `unity run <project> --command <name> -- --arg value`.
