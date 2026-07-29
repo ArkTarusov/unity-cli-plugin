@@ -55,6 +55,8 @@ unity --json --non-interactive <command>
 
 Exit code is `0` on success, non-zero on failure (e.g. `6` for an unknown editor command). Error messages usually include recovery hints — read them.
 
+For many commands in one session, `unity shell --protocol ndjson` runs a single warm process speaking one JSON request per line, one JSON result per line — amortizes the per-command startup cost.
+
 ## Auth
 
 Cloud-backed features (Pipeline package install, cloud, some licenses) need sign-in:
