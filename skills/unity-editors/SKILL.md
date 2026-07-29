@@ -25,6 +25,7 @@ unity editor add "C:\Path\To\Editor"   # register an editor installed outside th
 unity open ./MyProject                 # opens with the project's editor version
 unity open . --build-target Android
 unity projects list
+unity projects size .                  # on-disk footprint by top-level folder (--json = raw bytes)
 unity projects require . --json        # assert project's editor version is installed; installs if missing
 unity projects new MyGame --json       # CI-friendly project creation (create = interactive)
 unity templates list
