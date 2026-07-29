@@ -4,5 +4,8 @@
   "version": "0.1.0",
   "author": {
     "name": "Ark Tarusov"
-  }
+  },
+  "repository": "https://github.com/ArkTarusov/unity-cli-plugin",
+  "license": "MIT",
+  "keywords": ["unity", "unity-cli", "unity-editor", "automation", "gamedev"]
 }
