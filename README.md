@@ -10,7 +10,7 @@ The interesting part is live Editor control. With the [Unity Pipeline package](h
 
 Unity exposes that same Editor API through two interfaces: CLI (`unity command`) and MCP (`unity mcp` starts the server, `unity mcp configure <client>` writes the client config). This plugin is built for the CLI interface. It can help set up the MCP server, but contains no skills for working with the Editor through MCP. If you work through the CLI, install everything; if you prefer MCP, skip `unity-pipeline` — `unity-cli-core` and `unity-editors` are still useful.
 
-Unity maintains its own [unity-cli skill](https://github.com/Unity-Technologies/skills/tree/main/skills/unity-cli). The difference: theirs is reference material — which commands exist and their flags, kept current with new betas. This plugin is skills for the work itself: the conventions a session runs on (`confirm`/`dry_run`, status polling for async commands, the authoring root, recompile before attaching a new script) and recovery when things break — the agent that can't find an installed CLI (stale PATH), the wrong command name, the missing Pipeline package.
+Unity maintains its own [skills repo](https://github.com/Unity-Technologies/skills): a [unity-cli skill](https://github.com/Unity-Technologies/skills/tree/main/skills/unity-cli) plus skills beyond the CLI — guided new-project setup, UPM package management, Unity Services backends, in-app purchases, ads mediation. This plugin competes only on the CLI ground and deliberately stays out of the rest; its skill descriptions are worded not to trigger on that non-CLI territory, so the two plugins can coexist. On the shared ground the split is: their unity-cli is command reference first — which commands exist and their flags, kept current with each beta. This plugin is operations material: the conventions a session runs on (`confirm`/`dry_run`, status polling for async commands, the authoring root, recompile before attaching a new script), verified failure modes (silently dropped arguments, `EBUSY` lock contention, batch-mode editors invisible to `unity status`), and recovery when the CLI seems missing (stale PATH), the Pipeline package is absent, or the Editor hangs on a modal dialog or crashes.
 
 ## Skills
 
@@ -18,7 +18,7 @@ Unity maintains its own [unity-cli skill](https://github.com/Unity-Technologies/
 |---|---|
 | `unity-cli-core` | Finding the binary, non-interactive flags, JSON output, auth, command map |
 | `unity-editors` | Editor and module installs, licenses, opening and creating projects (what Unity Hub does) |
-| `unity-pipeline` | Driving the running Editor: play mode, builds, tests, scene and asset commands, status polling |
+| `unity-pipeline` | Driving the running Editor: play mode, builds, tests, scene and asset commands, status polling, resident headless editors, hang and crash recovery |
 
 The skills never install anything on their own. When the CLI or the Pipeline package is missing, the agent is instructed to propose the install command and wait for the user.
 
