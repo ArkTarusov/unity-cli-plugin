@@ -14,6 +14,7 @@ Consent rule: `install`, `install-modules`, `uninstall`, and `--allow-install` c
 ```bash
 unity editors -i                       # installed editors
 unity editors -r                       # available releases (also: unity releases --lts)
+unity editors running                  # running GUI Editor instances + open project (version, PID); does not list -batchmode editors
 unity install 6000.3.7f1 -m ios android --accept-eula -y
 unity install lts                      # version aliases: lts, latest streams
 unity install-modules -e 6000.3.7f1 -m webgl        # add modules later
