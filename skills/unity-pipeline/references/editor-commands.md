@@ -1,12 +1,14 @@
 <!--
-The command entries below are GENERATED — do not hand-edit them. Regenerate with:
-    unity --json command --project-path <project> > cmds.json
-    node tools/gen-commands-md.js cmds.json out.md
-Hand-maintained parts the generator does NOT produce (its own emitted preamble is
-older than the one in this file): this comment, the preamble paragraphs, the
-Contents section, and the "RuntimeOnly commands" section at the bottom.
-Regeneration replaces the whole file — re-apply the hand-maintained parts after,
-and update the version numbers in the preamble.
+GENERATED FILE — do not hand-edit any part of it, including the preamble and the
+Contents list. Regenerate from the com.unity.pipeline package sources with:
+    dotnet run --project tools/CommandRefGen -- --version latest
+No Unity Editor and no `unity --json command` dump is involved. Field notes that are
+not derivable from the package source (observed behaviour, links to other skill files)
+live in tools/CommandRefGen/annotations.json — add them there, not here.
+
+This copy still carries the content of the retired two-step pipeline (a live-editor dump
+plus a hand-spliced RuntimeOnly section). The first CommandRefGen run replaces the whole
+file, including these lines, and its diff summary reports what moved.
 -->
 
 # Editor command reference

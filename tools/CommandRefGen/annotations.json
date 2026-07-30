@@ -1,0 +1,21 @@
+{
+  // Field notes merged into the generated reference by tools/CommandRefGen.
+  //
+  // Everything a command's entry says is read out of the package source, except what is in
+  // here: behaviour observed in the field, and links to the other skill files. Keeping these
+  // notes out of the generated document is what lets the generator own that file end to end.
+  //
+  // Each key is a command name; the value is markdown appended after the command's
+  // description (and after any version-gate note the generator derives from `#if`).
+  // The generator warns about a key that matches no command in the package version it read.
+  "commands": {
+    "simulate_pointer":
+      "**Feeds a virtual device, not the OS cursor — UI raycasts work, but game code polling `Mouse.current` sees the virtual mouse; verify the click landed via its response, not via assumption.**",
+
+    "capture_runtime_element":
+      "Unlike the other RuntimeOnly commands it does not execute against the editor server; on an editor older than its Unity floor it fails with exit code 6, indistinguishably from an unknown command name.",
+
+    "quit":
+      "Against the editor this is the play-mode/app quit path — for shutting down the editor itself, prefer `eval EditorApplication.Exit(0)` (see [lifecycle-recovery.md](lifecycle-recovery.md))."
+  }
+}

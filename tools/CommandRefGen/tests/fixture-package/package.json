@@ -1,0 +1,6 @@
+{
+  "name": "com.unity.pipeline.fixture",
+  "displayName": "CommandRefGen fixture package",
+  "version": "9.9.9-fixture.1",
+  "description": "Not a real package. Exercises the generator's parsing against a checked-in source tree, so the tool can be verified without registry access or a Unity install."
+}

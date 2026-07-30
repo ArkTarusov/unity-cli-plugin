@@ -1,0 +1,71 @@
+name: command reference
+
+# Regenerates skills/unity-pipeline/references/editor-commands.md from the com.unity.pipeline
+# package sources on the public UPM registry. A bare runner with the .NET SDK is the whole
+# requirement — no Unity Editor, no license, no `unity --json command` dump.
+#
+# Triggered by hand, or by the release-watch workflow, which polls the same versions endpoint.
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'com.unity.pipeline version to document, or "latest"'
+        type: string
+        default: latest
+  workflow_call:
+    inputs:
+      version:
+        description: 'com.unity.pipeline version to document, or "latest"'
+        type: string
+        default: latest
+
+permissions:
+  contents: read
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      # Parsing regressions surface here, against the checked-in fixture package, before the
+      # generator is let near the real reference file.
+      - name: Verify the generator against its fixture package
+        run: tools/CommandRefGen/tests/run.sh
+
+      - name: Regenerate the command reference
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          set -o pipefail
+          dotnet run --project tools/CommandRefGen -- --version "$VERSION" 2>&1 | tee gen.log
+
+      - name: Diff summary
+        if: always()
+        run: |
+          {
+            echo '## Command reference'
+            echo
+            echo '```'
+            sed -n '/^diff against /,/commands)$/p' gen.log
+            echo '```'
+            echo
+            echo '### Warnings'
+            echo
+            echo '```'
+            grep '^warning:' gen.log || echo 'none'
+            echo '```'
+          } >>"$GITHUB_STEP_SUMMARY"
+          git diff --stat -- skills/
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: editor-commands
+          path: |
+            skills/unity-pipeline/references/editor-commands.md
+            gen.log
