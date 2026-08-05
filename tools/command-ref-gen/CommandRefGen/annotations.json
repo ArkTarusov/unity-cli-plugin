@@ -1,0 +1,7 @@
+{
+  "//": "Behaviour observed while driving a real editor that the package sources do not state. Appended verbatim to the generated description of the named command. Keep each note short and factual; anything the sources already say belongs in the sources, not here.",
+  "commands": {
+    "simulate_pointer": "**Feeds a virtual device, not the OS cursor — UI raycasts work, but game code polling `Mouse.current` sees the virtual mouse; verify the click landed via its response, not via assumption.**",
+    "quit": "Against the editor this is the play-mode/app quit path — to shut the editor itself down, prefer `eval EditorApplication.Exit(0)` (see [lifecycle-recovery.md](lifecycle-recovery.md))."
+  }
+}

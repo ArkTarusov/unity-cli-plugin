@@ -1,25 +1,26 @@
 <!--
-The command entries below are GENERATED — do not hand-edit them. Regenerate with:
-    unity --json command --project-path <project> > cmds.json
-    node tools/gen-commands-md.js cmds.json out.md
-Hand-maintained parts the generator does NOT produce (its own emitted preamble is
-older than the one in this file): this comment, the preamble paragraphs, the
-Contents section, and the "RuntimeOnly commands" section at the bottom.
-Regeneration replaces the whole file — re-apply the hand-maintained parts after,
-and update the version numbers in the preamble.
+GENERATED FILE — do not hand-edit any part of it, including this header and the prose below.
+The whole file is produced from the com.unity.pipeline package sources by tools/command-ref-gen/CommandRefGen:
+
+    dotnet run --project tools/command-ref-gen/CommandRefGen -- --version latest
+
+Change the wording in tools/command-ref-gen/CommandRefGen/templates/, add per-command field notes to
+tools/command-ref-gen/CommandRefGen/annotations.json, then regenerate. No Unity installation is needed.
 -->
+
+<!-- generated-from: com.unity.pipeline@0.4.0-exp.1 -->
 
 # Editor command reference
 
-Generated from `unity --json command` against Unity Pipeline package `0.4.0-exp.1` on Unity `6000.4`. The live list is dynamic (package version, project code, optional packages, project-defined `[CliCommand]` methods) — on a name/argument mismatch, re-check against the live output of `unity --json command`; this file covers the common core.
+Every `[CliCommand]` declared by the `com.unity.pipeline` package at version `0.4.0-exp.1` — 151 commands, 141 of them advertised by an editor server and 10 hidden from its listing. The commands a given editor actually answers to are dynamic (package version, optional packages, project-defined `[CliCommand]` methods); commands defined by a project rather than by the package are outside this file, so on a name or argument mismatch re-check against the live output of `unity --json command`.
 
-**The listing is not exhaustive — this file is more complete than `unity command`.** Commands whose `[CliCommand]` attribute sets `RuntimeOnly = true` are filtered out of the editor listing — they are designed for Unity **Player** connections (`unity command --runtime <player>`) — yet the editor server still executes them when called by name, in edit mode and play mode alike. The CLI never reveals their schemas; the [RuntimeOnly commands](#runtimeonly-commands-hidden-from-the-listing) section below, extracted from the package source, is the only schema source for them. Absence from the listing is not proof a command does not exist — a genuinely unknown name fails with exit code 6.
+**This file is more complete than `unity command`.** Commands whose `[CliCommand]` attribute sets `RuntimeOnly = true` are filtered out of the editor listing — they are designed for Unity **Player** connections (`unity command --runtime <player>`) — yet the editor server still executes them when called by name, in edit mode and play mode alike. The CLI never reveals their schemas; the [RuntimeOnly commands (hidden from the listing)](#runtimeonly-commands-hidden-from-the-listing) section below is the only schema source for them. Absence from the listing is not proof a command does not exist — a genuinely unknown name fails with exit code 6.
 
-Argument conventions: pass every argument as `--name value` (snake_case). `*` marks a required argument. Destructive commands need `--confirm true`; most mutating commands accept `--dry_run true`; async commands pair with a `*_status` poll command.
+Argument conventions: pass every argument as `--name value`, spelled exactly as this file lists it — most are snake_case, but a good few are camelCase (`assemblyDir`, `frameRate`, `exitCode`), and the server matches the name verbatim. `*` marks an argument the server refuses to run without — it can still carry a default, which is what the server would have used had the argument been optional. Destructive commands need `--confirm true`; most mutating commands accept `--dry_run true`; async commands pair with a `*_status` poll command. A note such as *(Unity 6000.7+ only)* means the command is compiled out on older editors and fails there with exit code 6.
 
 ## Contents
 
-[Editor & play mode](#editor--play-mode) · [Capture](#capture) · [Console & logs](#console--logs) · [Scenes](#scenes) · [GameObjects & components](#gameobjects--components) · [Prefabs](#prefabs) · [Assets & files](#assets--files) · [Scripts & compilation](#scripts--compilation) · [Tests](#tests) · [Build](#build) · [Packages (UPM)](#packages-upm) · [Materials & shaders](#materials--shaders) · [Animation & Timeline](#animation--timeline) · [Lighting bake](#lighting-bake) · [NavMesh bake](#navmesh-bake) · [Occlusion bake](#occlusion-bake) · [Project settings](#project-settings) · [RuntimeOnly commands](#runtimeonly-commands-hidden-from-the-listing)
+[Editor & play mode](#editor--play-mode) · [Capture](#capture) · [Console, logs & performance](#console-logs--performance) · [Search & selection](#search--selection) · [Scenes](#scenes) · [GameObjects & components](#gameobjects--components) · [Prefabs](#prefabs) · [Assets & files](#assets--files) · [Authoring](#authoring) · [Scripts & compilation](#scripts--compilation) · [Tests](#tests) · [Build](#build) · [Packages (UPM)](#packages-upm) · [Materials & shaders](#materials--shaders) · [Animation & Timeline](#animation--timeline) · [Lighting](#lighting) · [NavMesh](#navmesh) · [Occlusion culling](#occlusion-culling) · [Project settings](#project-settings) · [RuntimeOnly commands (hidden from the listing)](#runtimeonly-commands-hidden-from-the-listing)
 
 ## Editor & play mode
 
@@ -43,29 +44,22 @@ Get detailed Unity Editor status and state information
 Exit Unity Editor play mode
 - *(no arguments)*
 
-### get_selection
-Read the current Editor selection as structured object identities.
-- *(no arguments)*
-
 ### menu
 Execute an Editor menu item by path, or list available items when no path is given
 - `path` String (default "") — Menu item path to execute, e.g. "Assets/Reimport All". Omit to list available menu items.
-
-### save_all
-Save all open scenes that have unsaved changes.
-- *(no arguments)*
 
 ### set_autotick
 Keep the editor ticking while unfocused by forcing EditorApplication.SignalTick at a throttled rate
 - `enable` Boolean (default true) — Enable (true) or disable (false) auto-tick mode
 - `interval_ms` Int32 (default 16) — Minimum milliseconds between forced ticks. 0 = every update (max rate, pegs a CPU core). Default 16 (~60Hz).
 
-### set_selection
-Set the Editor selection to the given assets/scene objects.
-- `instance_ids` ObjectId[] — Scene/loaded object instance IDs to select.
-- `paths` String[] — Asset paths to select (e.g. Assets/Foo.prefab).
-
 ## Capture
+
+### capture_editor_element
+Capture a UI Toolkit VisualElement (by selector) from an EditorWindow to a PNG; returns path + base64. *(Unity 6000.7+ only)*
+- `window`\* String (default "") — EditorWindow type name (e.g. InspectorWindow) or window title to capture from.
+- `selector`\* String (default "") — Element selector: '#name', '.class', a type name (e.g. Button), descendant (space) / child ('>') chains, optional pseudo-states (:checked,:hover,:focus,:active,:enabled,:disabled,:not(...)).
+- `output` String (default "") — Output PNG path (absolute, or relative to the project root). Defaults to a timestamped file under `<project>`/Temp/pipeline-screenshots/.
 
 ### capture_game_view
 Render a camera to a PNG. Returns it inline as base64, unless save_path is set (path-only result; pass include_inline_image=true to get both).
@@ -87,11 +81,11 @@ Render the active Scene View to a PNG. Returns it inline as base64, unless save_
 ### screenshot
 Capture the Scene or Game view as a PNG and return its file path
 - `view` String (default "game") — Which view to capture: 'game' (default) or 'scene'
-- `output` String (default "") — Output PNG path (absolute, or relative to the project root). Defaults to a timestamped file under <project>/Temp/pipeline-screenshots/.
+- `output` String (default "") — Output PNG path (absolute, or relative to the project root). Defaults to a timestamped file under `<project>`/Temp/pipeline-screenshots/.
 - `width` Int32 (default 0) — Output width in pixels. 0 (default) uses the view camera's current width.
 - `height` Int32 (default 0) — Output height in pixels. 0 (default) uses the view camera's current height.
 
-## Console & logs
+## Console, logs & performance
 
 ### clear_console
 Clear the captured log buffer and the Unity Editor console.
@@ -107,6 +101,26 @@ Get captured Unity console output (Editor or Player; supports tail, level filter
 Read recently captured Editor console logs (structured).
 - `severity` String (default "all") — Filter: all | log | warning | error. 'all' = every entry; 'log' = Log only; 'warning' = Warning only; 'error' = Error/Exception/Assert only.
 - `limit` Int32 (default 100) — Max entries to return (most-recent first), capped at 1000.
+
+### get_performance_stats
+Read render, memory, and frame-timing stats (structured, read-only).
+- *(no arguments)*
+
+## Search & selection
+
+### get_selection
+Read the current Editor selection as structured object identities.
+- *(no arguments)*
+
+### search
+Run a Unity Search query and return structured results.
+- `query`\* String — Unity Search query string, e.g. 't:Material', 'p: my asset', 'h: Main Camera'.
+- `limit` Int32 (default 50) — Max results to return (capped 200).
+
+### set_selection
+Set the Editor selection to the given assets/scene objects.
+- `instance_ids` ObjectId[] — Scene/loaded object instance IDs to select.
+- `paths` String[] — Asset paths to select (e.g. Assets/Foo.prefab).
 
 ## Scenes
 
@@ -138,6 +152,10 @@ Open an existing scene from the given path.
 Remove a scene from the Build Settings scene list (idempotent).
 - `path`\* String — Scene path to remove (authoring-root relative; Assets/ prefix and .unity optional).
 
+### save_all
+Save all open scenes that have unsaved changes.
+- *(no arguments)*
+
 ### save_scene
 Save an open scene. Saves the active scene when no path is given.
 - `path` String — Path of the open scene to save (authoring-root relative; Assets/ prefix and .unity optional). Omit to save the active scene.
@@ -152,12 +170,6 @@ Set which open scene is the active scene (new objects are created in the active 
 Add a component (by type name) to a GameObject.
 - `target`\* ObjectRef — Handle of the GameObject.
 - `type`\* String — Component type name (e.g. 'Rigidbody' or 'UnityEngine.Camera').
-
-### attach_script
-Add a MonoBehaviour to a GameObject by its (compiled) type name OR by its script asset path. Provide exactly one of 'type' or 'script'. If the type isn't compiled yet, returns a recoverable error: recompile, poll recompile_status, then retry.
-- `target`\* ObjectRef — Reference to the GameObject to add the component to (globalId/path/guid/instanceId/hierarchyPath).
-- `type` String — Component type name to add, e.g. PlayerController or Game.Player.PlayerController. Must already be compiled. Mutually exclusive with 'script'.
-- `script` String — Script asset path, e.g. 'Assets/Pool/Scripts/CueShooter.cs'. The backing class is resolved via MonoScript.GetClass(), so the class name may differ from the filename. Mutually exclusive with 'type'.
 
 ### create_gameobject
 Create an empty GameObject or a built-in primitive (cube/sphere/capsule/cylinder/plane/quad) in the active scene.
@@ -323,10 +335,6 @@ Find assets by type and/or name and/or label, returning their path, GUID and typ
 - `search_in` String — Folder to scope the search to, relative to the authoring root (default: the authoring root).
 - `limit` Int32 (default 200) — Maximum number of results to return (default 200).
 
-### get_authoring_root
-Get the base folder (under Assets/) that bare authoring paths resolve against.
-- *(no arguments)*
-
 ### get_import_settings
 Read an asset's import settings, structured by importer type (texture/model/audio), including the default-platform fields and (for textures/audio) one platform override block.
 - `asset`\* ObjectRef — Reference to the asset whose importer to read (path / guid / globalId).
@@ -356,15 +364,6 @@ Rename an asset in place (keeps it in the same folder, keeps its GUID).
 - `new_name`\* String — New file name WITHOUT a folder path. The extension is preserved if omitted.
 - `dry_run` Boolean (default false) — If true, validate the rename without performing it.
 
-### search
-Run a Unity Search query and return structured results.
-- `query`\* String — Unity Search query string, e.g. 't:Material', 'p: my asset', 'h: Main Camera'.
-- `limit` Int32 (default 50) — Max results to return (capped 200).
-
-### set_authoring_root
-Set the base folder (under Assets/) that bare authoring paths resolve against and are confined to. Use 'Assets' for full project access.
-- `root`\* String — Project-relative folder under Assets/, e.g. Assets/AgentWork. Use 'Assets' to allow the whole project.
-
 ### set_import_settings
 Set import settings on an asset's AssetImporter (default platform top-level properties, or a texture/audio per-platform override) and re-import it.
 - `asset`\* ObjectRef — Reference to the asset whose importer to edit (path / guid / globalId).
@@ -379,7 +378,23 @@ Write UTF-8 text to a file under the authoring root, then import it. Overwriting
 - `confirm` Boolean (default false) — Required (true) only when overwriting an existing file at the path.
 - `dry_run` Boolean (default false) — If true, validate inputs and report what would be written without writing anything.
 
+## Authoring
+
+### get_authoring_root
+Get the base folder (under Assets/) that bare authoring paths resolve against.
+- *(no arguments)*
+
+### set_authoring_root
+Set the base folder (under Assets/) that bare authoring paths resolve against and are confined to. Use 'Assets' for full project access.
+- `root`\* String — Project-relative folder under Assets/, e.g. Assets/AgentWork. Use 'Assets' to allow the whole project.
+
 ## Scripts & compilation
+
+### attach_script
+Add a MonoBehaviour to a GameObject by its (compiled) type name OR by its script asset path. Provide exactly one of 'type' or 'script'. If the type isn't compiled yet, returns a recoverable error: recompile, poll recompile_status, then retry.
+- `target`\* ObjectRef — Reference to the GameObject to add the component to (globalId/path/guid/instanceId/hierarchyPath).
+- `type` String — Component type name to add, e.g. PlayerController or Game.Player.PlayerController. Must already be compiled. Mutually exclusive with 'script'.
+- `script` String — Script asset path, e.g. 'Assets/Pool/Scripts/CueShooter.cs'. The backing class is resolved via MonoScript.GetClass(), so the class name may differ from the filename. Mutually exclusive with 'type'.
 
 ### create_script
 Create a new C# script (default base class MonoBehaviour) from a template under the authoring root. NOTE: the type does not exist until a recompile completes — to attach it, call recompile, poll recompile_status, then attach_script.
@@ -463,10 +478,6 @@ Status of the current/most recent build: idle | queued | building | completed, w
 Read the current build configuration from EditorUserBuildSettings / EditorBuildSettings.
 - *(no arguments)*
 
-### get_player_settings
-Read PlayerSettings (company/product/version, scripting backend, API level).
-- *(no arguments)*
-
 ### list_build_profiles
 List Build Profile assets in the project (Unity 6 only). Returns feature_unavailable on earlier versions.
 - *(no arguments)*
@@ -478,13 +489,13 @@ List the known BuildTarget values with their group and whether build support is 
 ### set_build_settings
 Set mutable EditorUserBuildSettings fields. Does NOT manage scenes (use add_scene_to_build / remove_scene_from_build) or switch target (use switch_build_target). Use dry_run to preview.
 - `settings` SetBuildSettingsInput — Fields to change; omitted fields are left unchanged.
+  - `developmentBuild` Boolean — Build a Development Player (enables the debugger/profiler).
+  - `allowDebugging` Boolean — Allow script debugging (only effective with developmentBuild=true).
+  - `connectWithProfiler` Boolean — Auto-connect the Profiler (only effective with developmentBuild=true).
+  - `buildScriptsOnly` Boolean — Build only the scripts (skip data) for faster iteration.
+  - `symlinkSources` Boolean — Symlink runtime/plugin sources instead of copying (where supported).
+  - `il2CppCodeGeneration` String — IL2CPP code generation for the active target: OptimizeSpeed | OptimizeSize.
 - `confirm` Boolean (default false) — Apply the changes. Without it the call is refused.
-- `dry_run` Boolean (default false) — Preview the change without applying it.
-
-### set_player_settings
-Change PlayerSettings. Requires confirm=true; use dry_run to preview. Not undoable via Ctrl+Z. Scripting backend / API level changes trigger a domain reload.
-- `settings` PlayerSettingsInput — Fields to change; omitted fields are left unchanged.
-- `confirm` Boolean (default false) — Apply the change. Without it the call is refused.
 - `dry_run` Boolean (default false) — Preview the change without applying it.
 
 ### switch_build_target
@@ -553,7 +564,7 @@ Set shader properties on a material (Float/Range/Int=number; Color=[r,g,b,a] or 
 - `material`\* ObjectRef — Reference to the .mat asset (or a loaded material) to edit (path / guid / globalId / instanceId).
 - `shader` String — Reassign the material's shader by name (e.g. "Standard", "Universal Render Pipeline/Lit", or a Shader Graph shader name). Applied before properties so new property names resolve against the new shader.
 - `properties` JObject — JSON object of shader property name -> value. Names must include the leading underscore (e.g. _BaseColor). Float/Range/Int=number; Color=[r,g,b,a] or hex string; Vector=[x,y,z,w]; Texture=an object reference {guid/path} or null.
-- `renderQueue` Nullable`1 — Explicit render queue, or -1 to inherit from the shader. Omit to leave unchanged.
+- `renderQueue` Int32 — Explicit render queue, or -1 to inherit from the shader. Omit to leave unchanged.
 - `enableKeywords` String[] — Shader keywords to enable (e.g. _NORMALMAP, _EMISSION).
 - `disableKeywords` String[] — Shader keywords to disable.
 - `confirm` Boolean (default false) — Reserved for parity; editing an existing material is non-destructive and undoable, so it is not required.
@@ -669,7 +680,7 @@ Add or replace a single float curve binding on an AnimationClip (via AnimationUt
 - `keys`\* JArray — Keyframes: [{ time, value, inTangent?, outTangent?, weightedMode?: "None"|"In"|"Out"|"Both" }]. Omitted tangents default to 0 (flat); this is NOT Unity's Auto tangent mode.
 - `dry_run` Boolean (default false) — If true, validate type/property/keys without writing the curve.
 
-## Lighting bake
+## Lighting
 
 ### bake_lighting
 Trigger an async lightmap bake of the open scene(s) via Lightmapping.BakeAsync(). Returns immediately; poll lighting_bake_status until completed.
@@ -699,7 +710,7 @@ Apply a subset of lighting settings to the active LightingSettings. Returns { ap
 - `settings`\* JObject — JSON object with a subset of lighting fields to set (same names/enums as get_lighting_settings).
 - `dry_run` Boolean (default false) — If true, validate the keys and report applied/unknown without changing anything.
 
-## NavMesh bake
+## NavMesh
 
 ### bake_navmesh
 Trigger an async legacy NavMesh bake of the open scene(s) via UnityEditor.AI.NavMeshBuilder. Returns immediately; poll navmesh_bake_status until completed.
@@ -732,13 +743,13 @@ Apply a subset of legacy NavMesh bake settings to the default agent. Returns { a
 - `settings`\* JObject — JSON object with a subset of NavMesh fields to set (same names as get_navmesh_settings).
 - `dry_run` Boolean (default false) — If true, validate the keys and report applied/unknown without changing anything.
 
-## Occlusion bake
+## Occlusion culling
 
 ### bake_occlusion_culling
 Trigger an async occlusion-culling bake of the open scene(s) via StaticOcclusionCulling.GenerateInBackground(). Returns immediately; poll occlusion_bake_status until completed.
-- `smallest_occluder` Single (default -3.40282347e+38) — Smallest object that will occlude others (meters). Defaults to Unity's current value.
-- `smallest_hole` Single (default -3.40282347e+38) — Smallest gap geometry can have that the view can see through (meters). Defaults to Unity's current value.
-- `backface_threshold` Single (default -3.40282347e+38) — Backface threshold (1-100); lower trims more backfaces. Defaults to Unity's current value.
+- `smallest_occluder` Single (default -3.4028235e+38) — Smallest object that will occlude others (meters). Defaults to Unity's current value.
+- `smallest_hole` Single (default -3.4028235e+38) — Smallest gap geometry can have that the view can see through (meters). Defaults to Unity's current value.
+- `backface_threshold` Single (default -3.4028235e+38) — Backface threshold (1-100); lower trims more backfaces. Defaults to Unity's current value.
 - `confirm` Boolean (default false) — Accepted for parity (a bake overwrites existing occlusion data); not required.
 - `dry_run` Boolean (default false) — If true, validate there is an open scene and report the parameters that would be used without baking.
 
@@ -769,12 +780,12 @@ Read GraphicsSettings (default render pipeline).
 Read the legacy Input Manager axes (names and count).
 - *(no arguments)*
 
-### get_performance_stats
-Read render, memory, and frame-timing stats (structured, read-only).
-- *(no arguments)*
-
 ### get_physics_settings
 Read Physics settings (gravity, solver iterations, bounce threshold).
+- *(no arguments)*
+
+### get_player_settings
+Read PlayerSettings (company/product/version, scripting backend, API level).
 - *(no arguments)*
 
 ### get_quality_settings
@@ -792,92 +803,128 @@ Read Time settings (fixedDeltaTime, maximumDeltaTime, timeScale).
 ### set_audio_settings
 Change project Audio settings. Requires confirm=true; use dry_run to preview. Not undoable via Ctrl+Z.
 - `settings` AudioSettingsInput — Fields to change; omitted fields are left unchanged.
+  - `volume` Single — Global audio volume (0..1).
+  - `rolloffScale` Single — Global rolloff scale.
+  - `dopplerFactor` Single — Global doppler factor.
 - `confirm` Boolean (default false) — Apply the change. Without it the call is refused.
 - `dry_run` Boolean (default false) — Preview the change without applying it.
 
 ### set_graphics_settings
 Set the default render pipeline asset. Requires confirm=true; use dry_run to preview. Not undoable via Ctrl+Z.
 - `settings` GraphicsSettingsInput — Fields to change; omitted fields are left unchanged.
+  - `renderPipelineAsset` ObjectRef — Reference (path / guid / globalId) to a RenderPipelineAsset to set as the default. Pass an empty reference ({}) to select the built-in pipeline; omit to leave unchanged.
 - `confirm` Boolean (default false) — Apply the change. Without it the call is refused.
 - `dry_run` Boolean (default false) — Preview the change without applying it.
 
 ### set_input_settings
 Tune a legacy Input Manager axis (sensitivity/gravity/dead) by name. Requires confirm=true; use dry_run to preview. Not undoable via Ctrl+Z.
 - `settings` InputAxisInput — Axis change. 'axis' selects the axis by name; omitted numeric fields are left unchanged.
+  - `axis`\* String — Name of the axis to modify (e.g. 'Horizontal').
+  - `sensitivity` Single — New sensitivity.
+  - `gravity` Single — New gravity.
+  - `dead` Single — New dead-zone size.
 - `confirm` Boolean (default false) — Apply the change. Without it the call is refused.
 - `dry_run` Boolean (default false) — Preview the change without applying it.
 
 ### set_physics_settings
 Change Physics settings. Requires confirm=true; use dry_run to preview. Not undoable via Ctrl+Z.
 - `settings` PhysicsSettingsInput — Fields to change; omitted fields are left unchanged.
+  - `gravityX` Single — Gravity X component.
+  - `gravityY` Single — Gravity Y component (e.g. -9.81).
+  - `gravityZ` Single — Gravity Z component.
+  - `defaultSolverIterations` Int32 — Default solver iteration count.
+  - `bounceThreshold` Single — Bounce threshold velocity.
+- `confirm` Boolean (default false) — Apply the change. Without it the call is refused.
+- `dry_run` Boolean (default false) — Preview the change without applying it.
+
+### set_player_settings
+Change PlayerSettings. Requires confirm=true; use dry_run to preview. Not undoable via Ctrl+Z. Scripting backend / API level changes trigger a domain reload.
+- `settings` PlayerSettingsInput — Fields to change; omitted fields are left unchanged.
+  - `companyName` String — Company name.
+  - `productName` String — Product name.
+  - `bundleVersion` String — Bundle/application version string.
+  - `scriptingBackend` ScriptingImplementation — Scripting backend (e.g. Mono2x, IL2CPP). Triggers a domain reload.
+  - `apiCompatibilityLevel` ApiCompatibilityLevel — API compatibility level (e.g. NET_Standard_2_0, NET_Unity_4_8). Triggers a domain reload.
 - `confirm` Boolean (default false) — Apply the change. Without it the call is refused.
 - `dry_run` Boolean (default false) — Preview the change without applying it.
 
 ### set_quality_settings
 Change QualitySettings. Requires confirm=true; use dry_run to preview. Not undoable via Ctrl+Z.
 - `settings` QualitySettingsInput — Fields to change; omitted fields are left unchanged.
+  - `level` Int32 — Quality level index (see levelNames from get_quality_settings).
+  - `vSyncCount` Int32 — VSync count (0 = off, 1, 2).
+  - `antiAliasing` Int32 — MSAA sample count (0, 2, 4, 8).
 - `confirm` Boolean (default false) — Apply the change. Without it the call is refused.
 - `dry_run` Boolean (default false) — Preview the change without applying it.
 
 ### set_tags_layers
 Add/remove tags and assign user layer names (index 8-31). Requires confirm=true; use dry_run to preview. Not undoable via Ctrl+Z.
 - `settings` TagsLayersInput — Tag/layer changes to make.
+  - `addTags` String[] — Tag names to add.
+  - `removeTags` String[] — Tag names to remove.
+  - `setLayers` LayerAssignment[] — User layer assignments (index 8-31).
+    - `index`\* Int32 — Layer index (8-31 for user layers).
+    - `name`\* String — Layer name (empty string clears the slot).
 - `confirm` Boolean (default false) — Apply the change. Without it the call is refused.
 - `dry_run` Boolean (default false) — Preview the change without applying it.
 
 ### set_time_settings
 Change Time settings. Requires confirm=true; use dry_run to preview. Not undoable via Ctrl+Z.
 - `settings` TimeSettingsInput — Fields to change; omitted fields are left unchanged.
+  - `fixedDeltaTime` Single — Fixed timestep in seconds (e.g. 0.02).
+  - `maximumDeltaTime` Single — Maximum allowed timestep in seconds.
+  - `timeScale` Single — Time scale (1 = real-time).
 - `confirm` Boolean (default false) — Apply the change. Without it the call is refused.
 - `dry_run` Boolean (default false) — Preview the change without applying it.
+
 ## RuntimeOnly commands (hidden from the listing)
 
-Extracted from the `com.unity.pipeline` `0.4.0-exp.1` package source (`Runtime/Commands/`) — `unity command` does not list them and cannot show their schemas. They execute against the editor server despite the `RuntimeOnly` flag (exception: `capture_runtime_element`, see its entry); they also work against Player connections (`--runtime <process>` / `--runtime-path <port file>`). All require the main thread.
+Declared with `RuntimeOnly = true` in the `com.unity.pipeline` `0.4.0-exp.1` sources — `unity command` neither lists them nor shows their schemas. They execute against the editor server despite the flag, and they work against Player connections (`--runtime <process>` / `--runtime-path <port file>`). A version note on an entry still applies: a command compiled out on the running editor does not exist there and fails with exit code 6.
+
+### capture_runtime_element
+Capture a UI Toolkit VisualElement (by selector) from a live runtime panel (UIDocument or PanelRenderer) to a PNG; returns path + base64. *(Unity 6000.7+ only)*
+- `panel` String (default "") — Name of the target panel: matches the PanelSettings asset name or the host GameObject name (UIDocument or PanelRenderer). Optional when exactly one panel exists.
+- `selector`\* String (default "") — Element selector: '#name', '.class', a type name (e.g. Button), descendant (space) / child ('>') chains, optional pseudo-states (:checked,:hover,:focus,:active,:enabled,:disabled,:not(...)).
+- `output` String (default "") — Output PNG path (absolute, or relative to Application.persistentDataPath). Defaults to a timestamped file under Application.persistentDataPath.
+
+### cleanup_hotreload
+Remove old hot reload DLL versions and clear registry
+- `assemblyDir`\* String — Directory containing assemblies to cleanup
+- `force_domain_reload` Boolean (default true) — Force Unity domain reload after cleanup
+
+### hotreload_status
+Show current hot reload registry status and statistics
+- *(no arguments)*
+
+### log
+Write a message to Unity console
+- `message`\* String — Message to log to console
+- `level` String (default "info") — Log level: info, warning, error
+
+### quit
+Gracefully quit the Unity application. Against the editor this is the play-mode/app quit path — to shut the editor itself down, prefer `eval EditorApplication.Exit(0)` (see [lifecycle-recovery.md](lifecycle-recovery.md)).
+- `exitCode` Int32 (default 0) — Exit code for the application
+
+### runtime_status
+Get comprehensive runtime application status
+- *(no arguments)*
+
+### set_target_framerate
+Set the target frame rate for the application
+- `frameRate`\* Int32 — Target frame rate (-1 for platform default, 0 for unlimited)
+
+### set_timescale
+Set the time scale for the application
+- `scale`\* Single — Time scale multiplier (0.0 to pause, 1.0 for normal speed)
+
+### simulate_key
+Simulate a keyboard key event (Input System). Drives the running app.
+- `key`\* String — Input System Key name, e.g. Space, W, Enter, LeftArrow
+- `action` String (default "press") — down | up | press (down+up). Default: press
 
 ### simulate_pointer
 Simulate a mouse/pointer event at screen coordinates (Input System). **Feeds a virtual device, not the OS cursor — UI raycasts work, but game code polling `Mouse.current` sees the virtual mouse; verify the click landed via its response, not via assumption.**
 - `x`\* Single — Screen X in pixels (origin bottom-left)
 - `y`\* Single — Screen Y in pixels (origin bottom-left)
-- `action` String (default "click") — move | down | up | click (down+up)
-- `button` String (default "left") — left | right | middle
-
-### simulate_key
-Simulate a keyboard key event (Input System). Drives the running app.
-- `key`\* String — Input System Key name, e.g. Space, W, Enter, LeftArrow
-- `action` String (default "press") — down | up | press (down+up)
-
-### runtime_status
-Get comprehensive runtime application status.
-- *(no arguments)*
-
-### capture_runtime_element
-Capture a UI Toolkit VisualElement (by selector) from a live runtime panel (UIDocument or PanelRenderer) to a PNG; returns path + base64. **Unity 6000.7+ only** — the command is compiled out (`#if UNITY_6000_7_OR_NEWER`) on older versions and does not exist there: calling it fails with exit code 6.
-- `panel` String (default "") — Target panel name: PanelSettings asset name or host GameObject name. Optional when exactly one panel exists.
-- `selector`\* String — Element selector: '#name', '.class', a type name (e.g. Button), descendant (space) / child ('>') chains, optional pseudo-states (:checked, :hover, :focus, :active, :enabled, :disabled, :not(...)).
-- `output` String (default "") — Output PNG path (absolute, or relative to Application.persistentDataPath). Defaults to a timestamped file under Application.persistentDataPath.
-
-### set_timescale
-Set the time scale for the application.
-- `scale`\* Single — Time scale multiplier (0.0 to pause, 1.0 for normal speed)
-
-### set_target_framerate
-Set the target frame rate for the application.
-- `frameRate`\* Int32 — Target frame rate (-1 for platform default, 0 for unlimited)
-
-### quit
-Gracefully quit the Unity application. Against the editor this is the play-mode/app quit path — for shutting down the editor itself, prefer `eval EditorApplication.Exit(0)` (see [lifecycle-recovery.md](lifecycle-recovery.md)).
-- `exitCode` Int32 (default 0) — Exit code for the application
-
-### log
-Write a message to Unity console.
-- `message`\* String — Message to log to console
-- `level` String (default "info") — Log level: info, warning, error
-
-### hotreload_status
-Show current hot reload registry status and statistics.
-- *(no arguments)*
-
-### cleanup_hotreload
-Remove old hot reload DLL versions and clear registry.
-- `assemblyDir`\* String — Directory containing assemblies to cleanup
-- `force_domain_reload` Boolean (default true) — Force Unity domain reload after cleanup
+- `action` String (default "click") — move | down | up | click (down+up). Default: click
+- `button` String (default "left") — left | right | middle. Default: left
