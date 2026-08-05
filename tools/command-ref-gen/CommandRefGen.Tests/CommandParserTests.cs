@@ -176,10 +176,60 @@ public class CommandParserTests : IDisposable
     }
 
     [Fact]
+    public void Keeps_a_command_guarded_by_a_negated_condition()
+    {
+        // A symbol a file only ever negates (#if !UNITY_SERVER, #if !UNITY_6000_7_OR_NEWER) must stay
+        // undefined, or the guarded command would be parsed out of the reference.
+        var command = Assert.Single(Parse("""
+            #if !UNITY_SERVER
+            [CliCommand("interactive", "Needs a display")]
+            public static void Interactive() { }
+            #endif
+            """));
+
+        Assert.Equal("interactive", command.Name);
+        Assert.Equal(new[] { "!UNITY_SERVER" }, command.Gates);
+        Assert.Empty(warnings);
+    }
+
+    [Fact]
+    public void Keeps_a_command_under_a_mixed_condition_with_a_negated_term()
+    {
+        var command = Assert.Single(Parse("""
+            #if UNITY_EDITOR && !UNITY_SERVER
+            [CliCommand("editor_only", "Editor without server")]
+            public static void EditorOnly() { }
+            #endif
+            """));
+
+        Assert.Equal("editor_only", command.Name);
+        Assert.Empty(warnings);
+    }
+
+    [Fact]
+    public void Reports_a_command_under_a_symbol_the_file_tests_both_ways()
+    {
+        // One parse cannot satisfy #if X and #if !X at once; the losing branch must not vanish quietly.
+        var commands = Parse("""
+            #if UNITY_6000_7_OR_NEWER
+            [CliCommand("modern", "New way")]
+            public static void Modern() { }
+            #endif
+            #if !UNITY_6000_7_OR_NEWER
+            [CliCommand("legacy", "Old way")]
+            public static void Legacy() { }
+            #endif
+            """);
+
+        Assert.Equal("modern", Assert.Single(commands).Name);
+        Assert.Contains(warnings, w => w.Contains("inactive conditional branch"));
+    }
+
+    [Fact]
     public void Reports_a_command_left_in_an_inactive_branch()
     {
-        // Every symbol a file mentions is defined, so the #else body never reaches the tree; dropping it
-        // without a word would take a command out of the reference invisibly.
+        // One parse cannot activate both arms of an #if/#else, so the #else body never reaches the tree;
+        // dropping it without a word would take a command out of the reference invisibly.
         var commands = Parse("""
             #if UNITY_6000_7_OR_NEWER
             [CliCommand("modern", "New way")]

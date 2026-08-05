@@ -144,15 +144,21 @@ public sealed class CommandParser(Action<string> warn)
     {
         var text = File.ReadAllText(path);
 
-        // Parse once with nothing defined only to learn which preprocessor symbols the file talks about,
-        // then re-parse with all of them defined so that version-gated commands are present in the tree.
+        // Parse once with nothing defined only to learn which preprocessor symbols the file talks about
+        // and with which polarity, then re-parse with the right ones defined so that guarded commands are
+        // present in the tree. A symbol the file only tests positively (#if UNITY_6000_7_OR_NEWER) is
+        // defined; one it only negates (#if !UNITY_SERVER) is left undefined, so that branch is active
+        // too. A symbol tested both ways cannot be satisfied by one parse — it is defined, and the losing
+        // branch is caught by ReportHiddenCommands below.
         var probe = CSharpSyntaxTree.ParseText(text, new CSharpParseOptions(LanguageVersion.Latest), path: relativePath);
         var conditionals = Directives(probe.GetRoot()).OfType<ConditionalDirectiveTriviaSyntax>().ToList();
-        var symbols = conditionals
-            .SelectMany(d => d.Condition.DescendantNodesAndSelf().OfType<IdentifierNameSyntax>())
-            .Select(i => i.Identifier.ValueText)
-            .Distinct(StringComparer.Ordinal)
-            .ToList();
+
+        var positive = new HashSet<string>(StringComparer.Ordinal);
+        var negative = new HashSet<string>(StringComparer.Ordinal);
+        foreach (var conditional in conditionals)
+            CollectPolarities(conditional.Condition, negated: false, positive, negative);
+
+        var symbols = positive.ToList();
 
         var tree = CSharpSyntaxTree.ParseText(
             text,
@@ -164,10 +170,11 @@ public sealed class CommandParser(Action<string> warn)
     }
 
     /// <summary>
-    /// Defining every symbol a file mentions activates the first branch of each <c>#if</c> chain, so a
-    /// command declared in an <c>#else</c>, an <c>#elif</c>, or under a negated condition stays inactive
-    /// and never reaches the syntax tree. Those branches survive as disabled text — report any that
-    /// declares a command rather than dropping it without a word.
+    /// The symbol choice in <see cref="ParseTree"/> satisfies each condition where it can, but one parse
+    /// cannot activate both arms of an <c>#if</c>/<c>#else</c>, nor both branches of a symbol the file
+    /// tests positively in one place and negated in another. The losing branch never reaches the syntax
+    /// tree; it survives as disabled text — report any that declares a command rather than dropping it
+    /// without a word.
     /// </summary>
     private void ReportHiddenCommands(SyntaxTree tree, string relativePath)
     {
@@ -406,6 +413,36 @@ public sealed class CommandParser(Action<string> warn)
             var (condition, start) = open.Pop();
             scopes.Add((TextSpan.FromBounds(start, Math.Max(start, end)), condition));
             return condition;
+        }
+    }
+
+    /// <summary>
+    /// Records with which polarity a condition tests each symbol: <c>UNITY_EDITOR &amp;&amp; !UNITY_SERVER</c>
+    /// tests the first positively and the second negatively, and <c>!(A || B)</c> negates both. An
+    /// equality comparison (<c>X == false</c>) is rare enough in package guards that its operands are
+    /// simply counted as positive; a command lost to that goes through the hidden-command report, not
+    /// through silence.
+    /// </summary>
+    private static void CollectPolarities(ExpressionSyntax condition, bool negated, ISet<string> positive, ISet<string> negative)
+    {
+        switch (condition)
+        {
+            case IdentifierNameSyntax identifier:
+                (negated ? negative : positive).Add(identifier.Identifier.ValueText);
+                break;
+
+            case PrefixUnaryExpressionSyntax unary when unary.IsKind(SyntaxKind.LogicalNotExpression):
+                CollectPolarities(unary.Operand, !negated, positive, negative);
+                break;
+
+            case ParenthesizedExpressionSyntax parenthesized:
+                CollectPolarities(parenthesized.Expression, negated, positive, negative);
+                break;
+
+            case BinaryExpressionSyntax binary:
+                CollectPolarities(binary.Left, negated, positive, negative);
+                CollectPolarities(binary.Right, negated, positive, negative);
+                break;
         }
     }
 
