@@ -1,0 +1,3 @@
+# The tool sources are compared against string literals that embed the line endings of the file they
+# are written in, so a checkout that rewrote them to CRLF would break the tests.
+* text=auto eol=lf

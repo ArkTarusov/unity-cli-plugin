@@ -1,0 +1,62 @@
+{
+  "rules": {
+    "Editor/Commands/PlayModeCommands.cs": "Editor & play mode",
+    "Editor/Commands/EditorStatusCommand.cs": "Editor & play mode",
+    "Editor/Commands/FocusEditorCommand.cs": "Editor & play mode",
+    "Editor/Commands/AutoTickCommand.cs": "Editor & play mode",
+    "Editor/Commands/MenuItemCommand.cs": "Editor & play mode",
+
+    "Editor/Commands/Capture/": "Capture",
+    "Editor/Commands/CaptureEditorElementCommand.cs": "Capture",
+    "Editor/Commands/ScreenshotCommand.cs": "Capture",
+
+    "Editor/Commands/Observability/": "Console, logs & performance",
+    "Runtime/Commands/ConsoleCommand.cs": "Console, logs & performance",
+
+    "Editor/Commands/Navigation/": "Search & selection",
+    "Editor/Commands/Scenes/": "Scenes",
+    "Editor/Commands/GameObjects/": "GameObjects & components",
+    "Editor/Commands/Scripts/SerializedFieldCommands.cs": "GameObjects & components",
+    "Editor/Commands/Prefabs/": "Prefabs",
+    "Editor/Commands/Assets/": "Assets & files",
+    "Editor/Commands/Authoring/": "Authoring",
+
+    "Editor/Commands/Scripts/": "Scripts & compilation",
+    "Editor/Commands/RecompileCommand.cs": "Scripts & compilation",
+    "Runtime/Commands/CodeEvalCommand.cs": "Scripts & compilation",
+    "Runtime/Commands/HotReloadCommands.cs": "Scripts & compilation",
+
+    "Editor/Commands/TestCommands.cs": "Tests",
+    "Editor/Commands/Build/": "Build",
+    "Editor/Commands/PackageManager/": "Packages (UPM)",
+    "Editor/Commands/Materials/": "Materials & shaders",
+    "Editor/Commands/Animation/": "Animation & Timeline",
+
+    "Editor/Commands/Baking/LightingBakeCommands.cs": "Lighting",
+    "Editor/Commands/Baking/NavMeshBakeCommands.cs": "NavMesh",
+    "Editor/Commands/Baking/OcclusionBakeCommands.cs": "Occlusion culling",
+
+    "Editor/Commands/ProjectSettings/": "Project settings"
+  },
+  "order": [
+    "Editor & play mode",
+    "Capture",
+    "Console, logs & performance",
+    "Search & selection",
+    "Scenes",
+    "GameObjects & components",
+    "Prefabs",
+    "Assets & files",
+    "Authoring",
+    "Scripts & compilation",
+    "Tests",
+    "Build",
+    "Packages (UPM)",
+    "Materials & shaders",
+    "Animation & Timeline",
+    "Lighting",
+    "NavMesh",
+    "Occlusion culling",
+    "Project settings"
+  ]
+}

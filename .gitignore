@@ -1,0 +1,9 @@
+# .NET build output of the tools; scoped so that a "bin" or "obj" directory of
+# skill content elsewhere in the repository is still tracked.
+tools/**/bin/
+tools/**/obj/
+
+# IDE state for the tool solution.
+.idea/
+.vs/
+*.user
